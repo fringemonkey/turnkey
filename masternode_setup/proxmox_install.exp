@@ -1,0 +1,90 @@
+#!/usr/bin/expect -f
+
+# Set the required variables
+set timeout -1
+set vm_id [lindex $argv 0]
+set email "your_email@example.com"
+
+# Random password generation
+set password_length 16
+set characters "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()"
+set root_password ""
+for {set i 0} {$i < $password_length} {incr i} {
+    set root_password $root_password[string index $characters [expr {int(rand() * [string length $characters])}]]
+}
+
+spawn qm console $vm_id
+
+expect {
+    "Proxmox Virtual Environment" {
+        send -- "\r"
+    }
+}
+
+expect {
+    "Country, State, Locality" {
+        send -- "\r"
+    }
+}
+
+expect {
+    "Organization" {
+        send -- "\r"
+    }
+}
+
+expect {
+    "Email Address" {
+        send -- "$email\r"
+    }
+}
+
+expect {
+    "installation mode" {
+        send -- "\r"
+    }
+}
+
+expect {
+    "select a target disk" {
+        send -- "\r"
+    }
+}
+
+expect {
+    "erase all data" {
+        send -- "\r"
+    }
+}
+
+expect {
+    "password for the new user" {
+        send -- "$root_password\r"
+    }
+}
+
+expect {
+    "password again" {
+        send -- "$root_password\r"
+    }
+}
+
+expect {
+    "Installation finished" {
+        send -- "\r"
+    }
+}
+
+expect {
+    "login:" {
+        send -- "\x04"
+    }
+}
+
+expect eof
+
+# Print the generated password and wait for the user to press a key
+puts "\nThe generated root password for the Proxmox VE instance is: $root_password"
+puts "Press ENTER to continue..."
+flush stdout
+gets stdin
