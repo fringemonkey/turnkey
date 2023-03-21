@@ -7,17 +7,29 @@ source error_catching.sh
 
 current_step=${1:-1}
 
+verify_step() {
+    local step_name=$1
+    local verification_cmd=$2
+
+    echo -n "Verifying ${step_name}... "
+    if eval "$verification_cmd" > /dev/null 2>&1; then
+        echo "OK"
+    else
+        echo "Failed"
+    fi
+}
+
 while [ $current_step -le $TOTAL_STEPS ]; do
     case $current_step in
         1) echo "1. Updating and upgrading packages..."; apt-get update > /dev/null 2>&1 && apt-get -y upgrade > /dev/null 2>&1 ;;
         2) echo "2. Securing the server..."; sed -i 's/^PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config > /dev/null 2>&1 && systemctl restart ssh > /dev/null 2>&1 ;;
         3) echo "3. Installing Fail2Ban..."; apt-get -y install fail2ban > /dev/null 2>&1 && systemctl enable fail2ban > /dev/null 2>&1 && systemctl start fail2ban > /dev/null 2>&1 ;;
         4) echo "4. Performing post-install steps..."; sed -i 's/main/main contrib non-free/g' /etc/apt/sources.list > /dev/null 2>&1 && apt-get update > /dev/null 2>&1 && apt-get -y install vim htop tmux > /dev/null 2>&1 ;;
-        5) echo "5. Configuring dark mode..."; apt-get -y install git > /dev/null 2>&1 && git clone https://github.com/Weilbyte/PVEDiscordDark.git /tmp/PVEDiscordDark > /dev/null 2>&1 ;;
-        6) echo "6. Running the install script..."; cd /tmp/PVEDiscordDark && ./install.sh > /dev/null 2>&1 && cd ~ ;;
-        7) echo "7. Removing temporary repository folder..."; rm -rf /tmp/PVEDiscordDark > /dev/null 2>&1 ;;
-        8) echo "8. Restarting Proxmox services..."; systemctl restart pveproxy pvestatd > /dev/null 2>&1 ;;
-        9) echo "Post-install script complete! The server is now secured, post-install steps are performed, and dark mode is enabled." > /dev/null 2>&1 ;;
+        5) echo "5. Installing dark mode..."; bash <(curl -s https://raw.githubusercontent.com/Weilbyte/PVEDiscordDark/master/PVEDiscordDark.sh ) install > /dev/null 2>&1 ;;
+        6) echo "6. Verifying steps..."; verify_step "packages update and upgrade" "apt list --upgradable 2>/dev/null | grep -q 'upgradable' && echo 'false' || echo 'true'" ;;
+        7) echo "7. Verifying steps..."; verify_step "server security" "grep -q 'PermitRootLogin no' /etc/ssh/sshd_config" ;;
+        8) echo "8. Verifying steps..."; verify_step "Fail2Ban installation" "systemctl is-active --quiet fail2ban" ;;
+        9) echo "9. Verifying steps..."; verify_step "post-install steps" "which vim && which htop && which tmux" ;;
     esac
 
     progress_bar $TOTAL_STEPS $current_step
@@ -25,4 +37,4 @@ while [ $current_step -le $TOTAL_STEPS ]; do
     current_step=$((current_step + 1))
 done
 
-
+echo "Post-install script complete! The server is now secured, post-install steps are performed, and dark mode is enabled."
