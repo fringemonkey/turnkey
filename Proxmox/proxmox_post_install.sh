@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Run with 
+# wget https://raw.githubusercontent.com/fringemonkey/turnkey/3751920478010397078b1760d677c9a6b98ab313/Proxmox/proxmox_post_install.sh && chmod +x proxmox_post_install.sh && ./proxmox_post_install.sh
+#
+
 # Update the package index and upgrade existing packages
 echo "Updating and upgrading packages..."
 apt-get update && apt-get -y upgrade
