@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # To run the script, use the following one-liner:
-# wget https://raw.githubusercontent.com/fringemonkey/turnkey/main/Proxmox/proxmox_post_install.sh && chmod +x proxmox_post_install.sh && ./proxmox_post_install.sh
+# wget https://raw.githubusercontent.com/fringemonkey/turnkey/main/Proxmox/error_catching.sh && chmod +x error_catching.sh && wget https://raw.githubusercontent.com/fringemonkey/turnkey/main/Proxmox/proxmox_post_install.sh && chmod +x proxmox_post_install.sh && ./proxmox_post_install.sh
 
 source error_catching.sh
 
