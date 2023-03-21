@@ -31,26 +31,18 @@ apt-get update && apt-get -y install vim htop tmux
 # Configure dark mode for the Proxmox web interface
 echo "Configuring dark mode..."
 
-# Install the dark theme package
-echo "Installing the dark theme package..."
-apt-get -y install proxmox-theme-dark
+# Clone the Discord-like theme repository
+echo "Cloning the Discord-like theme repository..."
+apt-get -y install git
+git clone https://github.com/Weilbyte/PVEDiscordDark.git /tmp/PVEDiscordDark
 
-# Enable the dark mode
-echo "Enabling dark mode..."
-echo "DATA_DIR=\"/usr/share/pve-manager\"
-CSS_EXT_FILE=\"$DATA_DIR/ext6/ext-theme-gray/ext-theme-gray-all.css\"
-CSS_DARK_FILE=\"$DATA_DIR/ext6/proxmox-theme-dark/proxmox-theme-dark-all.css\"
+# Run the install script from the repository
+echo "Running the install script..."
+bash /tmp/PVEDiscordDark/install.sh
 
-if [ -f \"$CSS_DARK_FILE\" ]; then
-    echo \"Dark mode enabled.\"
-    mv \"$CSS_EXT_FILE\" \"$CSS_EXT_FILE.bak\"
-    ln -s \"$CSS_DARK_FILE\" \"$CSS_EXT_FILE\"
-else
-    echo \"Error: Dark mode CSS file not found.\"
-    exit 1
-fi" > /usr/local/bin/enable-darkmode.sh
-chmod +x /usr/local/bin/enable-darkmode.sh
-/usr/local/bin/enable-darkmode.sh
+# Remove the temporary repository folder
+echo "Removing temporary repository folder..."
+rm -rf /tmp/PVEDiscordDark
 
 # Restart the Proxmox services
 echo "Restarting Proxmox services..."
