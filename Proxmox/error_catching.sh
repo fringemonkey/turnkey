@@ -18,4 +18,4 @@ function progress_bar() {
     echo -ne "] $percent% "
 }
 
-TOTAL_STEPS=8
+TOTAL_STEPS=9
